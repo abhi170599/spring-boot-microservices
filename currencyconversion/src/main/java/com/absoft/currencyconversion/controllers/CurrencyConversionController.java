@@ -3,10 +3,12 @@ package com.absoft.currencyconversion.controllers;
 import java.math.BigDecimal;
 
 import com.absoft.currencyconversion.beans.CurrencyConversion;
+import com.absoft.currencyconversion.clients.CurrencyExchangeProxy;
 import com.absoft.currencyconversion.exceptions.NotFoundException;
 
 import static com.absoft.currencyconversion.clients.CurrencyExchangeClient.getExchangeUrl;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,6 +18,9 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class CurrencyConversionController {
+
+    @Autowired
+    private CurrencyExchangeProxy currencyExchangeProxy;
     
     @GetMapping(path="/v1/convert")
     public CurrencyConversion convertCurrency(@RequestParam(name="from",required = true) String from,
@@ -42,4 +47,21 @@ public class CurrencyConversionController {
             
             return currencyConversion;                                   
     }
+
+    @GetMapping(path="/v2/convert")
+    public CurrencyConversion convertCurrencyV2(@RequestParam(name="from",required = true) String from,
+                                              @RequestParam(name="to",required = true) String to,
+                                              @RequestParam(name="quantity",required = true) long quantity) {
+            
+        CurrencyConversion currencyConversion = currencyExchangeProxy.retrieveExchange(from, to); 
+        
+        return new CurrencyConversion(from,to,quantity,
+                    currencyConversion.getConversionMultiple(),
+                    currencyConversion.getConversionMultiple().multiply(
+                        BigDecimal.valueOf(quantity))
+                    );
+
+
+    }                                            
+            
 }

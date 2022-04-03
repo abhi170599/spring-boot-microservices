@@ -25,7 +25,7 @@ public class CurrencyExchangeController {
     private CurrencyExchangeRepository currencyExcahngeRepository;
 
     @GetMapping(path="/exchanges")
-    public CurrencyExchange retrieveExcahnge(@RequestParam(name="from",required = true) String from,
+    public CurrencyExchange retrieveExchange(@RequestParam(name="from",required = true) String from,
                                      @RequestParam(name="to",required = true) String to) {
         Optional<CurrencyExchange> exchange = 
                     currencyExcahngeRepository.getByFromAndTo(from,to);
